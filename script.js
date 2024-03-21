@@ -4,6 +4,7 @@ const tasksList= document.querySelector('.tasks-list');
 const selectAll = document.querySelector('.i-2');
 const cancel = document.querySelector('.i-3');
 
+
 let tasksArray = [];
 
 function addTask () {
@@ -35,6 +36,9 @@ function changes(event){
     if (event.target.tagName === 'INPUT'){
         const elem = tasksArray.findIndex((elem) => elem.id === taskId)
         tasksArray[elem].isChecked = !tasksArray[elem].isChecked;
+        if (event.target.tagName === 'Enter') {
+        addTask();
+    }
         render();
     }
 }
@@ -50,10 +54,11 @@ function checkAndDelete(){
 
 function handleEnter (event) {
     if (event.code === 'Enter') {
-        render();
+        addTask();
     }
 }
 
+inp.addEventListener('keydown', handleEnter);
 selectAll.addEventListener('click', checkAll);
 cancel.addEventListener('click', checkAndDelete);
 tasksList.addEventListener('click', changes);
