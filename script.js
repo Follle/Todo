@@ -78,23 +78,18 @@ function saveInput(event){
         tasksArray[tasksArray.findIndex((item) => Number(item.id) === Number(input.id))].text = input.value;
         render();
     }
-}
-
-input.onblur = function() {
-    tasksArray[tasksArray.findIndex((item) => Number(item.id) === Number(input.id))].text = input.value;
-    render();
-    escapeTask();
-}
-
-function escapeTask(event){
-    console.log("fdfghj");
-    if (event.Code === 'Escape'){
-        console.log("fdfghj");
-    }
     
+    if (event.code === 'Escape'){
+        render();
+    }
 }
 
-//btn.addEventListener('keydown', escapeTask);
+input.onblur = function(event) {
+    if (event.sourceCapabilities !== null) {
+        tasksArray[tasksArray.findIndex((item) => Number(item.id) === Number(input.id))].text = input.value;
+   render();
+    }
+}
 input.addEventListener('keydown', saveInput);
 inp.addEventListener('keydown', handleEnter);
 selectAll.addEventListener('click', checkAll);
