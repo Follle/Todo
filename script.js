@@ -4,6 +4,7 @@ const tasksList= document.querySelector('.tasks-list');
 const selectAll = document.querySelector('.i-2');
 const cancel = document.querySelector('.i-3');
 const input = document.createElement('input');
+//const showAllCompleted = document.createElement ('completed');
 
 
 let tasksArray = [];
@@ -17,27 +18,20 @@ function addTask () {
         isChecked: false,
     }); 
     render();
-
-   
-
-
-    //console.log("isChecked");
-    //console.log('Check:'+ checkAllCount);
-
 }
 
 function render() {// выводит инфу
     tasksList.innerHTML= "";
     tasksArray.forEach((elem) => tasksList.innerHTML += `<div id="${elem.id}">
     <input type="checkbox" ${elem.isChecked ? 'checked' : ''}><label>${elem.text}</label>
-    <button>X</button>
-    </div>`);
+    <button>X</button>`);
+    countCheck();
+    
 }
 
 function changes(event){//изменения инпута
     const taskId = Number(event.target.parentElement.id);
     if (event.target.tagName === 'BUTTON'){
-        // tasksArray = tasksArray.filter((item)=> item.id !== taskId);
         const elem = tasksArray.findIndex((elem) => elem.id === taskId)
         tasksArray.splice(elem, 1);
         countCheck();
@@ -107,15 +101,19 @@ input.onblur = function(event) {// сохранение при блюре
 }
 
 function countCheck(){// считает выбранные и не очень 
- 
-    checkAllCount = tasksArray.filter((item) => item.isChecked).length
-    console.log(checkAllCount);
-
+    checkAllCount = tasksArray.filter((item) => item.isChecked).length;
     notCheckAllCount =tasksArray.length - checkAllCount;
-    console.log(notCheckAllCount);
+    let isFirst = true;
+    
+    tasksList.innerHTML += `</div><label>${"Active" + "(" + checkAllCount + ")" + "  "}</label>` ;
+    tasksList.innerHTML += `</div><label>${"  " + "Completed" + "(" + notCheckAllCount + ")" + "     "}</label>`;     
+    tasksList.innerHTML += `</div><label>${"  " + "All" + "(" + (checkAllCount+notCheckAllCount) + ")" }</label>`;  
+   
+    
 
 }
 
+//showAllCompleted.addEventListener('click',countCheck);
 input.addEventListener('keydown', saveInput);
 inp.addEventListener('keydown', handleEnter);
 selectAll.addEventListener('click', checkAll);
