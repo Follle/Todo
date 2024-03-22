@@ -5,7 +5,10 @@ const selectAll = document.querySelector('.i-2');
 const cancel = document.querySelector('.i-3');
 const input = document.createElement('input');
 
+
 let tasksArray = [];
+let checkAllCount=[];
+let notCheckAllCount=0;
 
 function addTask () {
     tasksArray.push({
@@ -14,53 +17,65 @@ function addTask () {
         isChecked: false,
     }); 
     render();
-    
+
+   
+
+
+    //console.log("isChecked");
+    //console.log('Check:'+ checkAllCount);
+
 }
 
-function render() {
+function render() {// выводит инфу
     tasksList.innerHTML= "";
     tasksArray.forEach((elem) => tasksList.innerHTML += `<div id="${elem.id}">
-    <input type="checkbox" ${elem.isChecked ? 'checked' : '' }><label>${elem.text}</label>
+    <input type="checkbox" ${elem.isChecked ? 'checked' : ''}><label>${elem.text}</label>
     <button>X</button>
     </div>`);
-    
 }
 
-function changes(event){
+function changes(event){//изменения инпута
     const taskId = Number(event.target.parentElement.id);
     if (event.target.tagName === 'BUTTON'){
         // tasksArray = tasksArray.filter((item)=> item.id !== taskId);
         const elem = tasksArray.findIndex((elem) => elem.id === taskId)
         tasksArray.splice(elem, 1);
+        countCheck();
         render();
+
     }
 
-    if (event.target.tagName === 'INPUT' && event.target.type === 'checkbox'){
+    if (event.target.tagName === 'INPUT' && event.target.type === 'checkbox'){//удаляет завершенные
         const elem = tasksArray.findIndex((elem) => elem.id === taskId)
         tasksArray[elem].isChecked = !tasksArray[elem].isChecked;
         if (event.target.tagName === 'Enter') {
         addTask();
     }
+        countCheck();
         render();
+        
     }
+
+   
 }
-function checkAll(){
+function checkAll(){//делает все чекбоксы сделанными
     tasksArray.forEach((elem)=>elem.isChecked =true);
     render();
+
 }
 
-function checkAndDelete(){
+function checkAndDelete(){// удаляет по одному
    tasksArray = tasksArray.filter((item) => !item.isChecked)
    render();
 }
 
-function handleEnter (event) {
+function handleEnter (event) { // сохраняет при нажатии enter
     if (event.code === 'Enter') {
         addTask();
     }
 }
 
-function editTask(event){
+function editTask(event){//редактирование существующего
     const taskId = Number(event.target.parentElement.id);
     const temp = event.target;
     if (event.target.tagName === 'LABEL')
@@ -74,22 +89,33 @@ function editTask(event){
 }
 
 function saveInput(event){
-    if (event.code === 'Enter') {
+    if (event.code === 'Enter') { //сохраняет при нажатии enter 
         tasksArray[tasksArray.findIndex((item) => Number(item.id) === Number(input.id))].text = input.value;
         render();
     }
     
-    if (event.code === 'Escape'){
+    if (event.code === 'Escape'){//отменяет изменения при нажатии escape
         render();
     }
 }
 
-input.onblur = function(event) {
+input.onblur = function(event) {// сохранение при блюре
     if (event.sourceCapabilities !== null) {
         tasksArray[tasksArray.findIndex((item) => Number(item.id) === Number(input.id))].text = input.value;
-   render();
+    render();
     }
 }
+
+function countCheck(){// считает выбранные и не очень 
+ 
+    checkAllCount = tasksArray.filter((item) => item.isChecked).length
+    console.log(checkAllCount);
+
+    notCheckAllCount =tasksArray.length - checkAllCount;
+    console.log(notCheckAllCount);
+
+}
+
 input.addEventListener('keydown', saveInput);
 inp.addEventListener('keydown', handleEnter);
 selectAll.addEventListener('click', checkAll);
