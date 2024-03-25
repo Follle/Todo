@@ -3,13 +3,19 @@ const inp = document.querySelector('.i-1');
 const tasksList= document.querySelector('.tasks-list');
 const selectAll = document.querySelector('.i-2');
 const cancel = document.querySelector('.i-3');
+const showAllCompleted = document.querySelector('.i-4');
 const input = document.createElement('input');
-//const showAllCompleted = document.createElement ('completed');
+const showStatus = document.querySelector('.tab-btn');
+const btnAll = document.getElementById('all');
+const btnCompleted = document.getElementById('completed');
+const btnActive = document.getElementById('active');
+//addconst content = document.querySelector('.content');
 
 
 let tasksArray = [];
 let checkAllCount=[];
 let notCheckAllCount=0;
+let filtrationStatus = 'all';
 
 function addTask () {
     tasksArray.push({
@@ -21,12 +27,34 @@ function addTask () {
 }
 
 function render() {// выводит инфу
+    let tempArray = [];
+    switch(filtrationStatus){
+        case "all": {
+            
+            tempArray = tasksArray;
+            // showStatus.textContent = "All("+(checkAllCount+notCheckAllCount)+")";
+            break;
+        }
+        case "completed": {
+          
+            tempArray = tasksArray.filter((item) => item.isChecked);
+            // showStatus.textContent = "Completed("+checkAllCount+")";
+            break;
+        }    
+        case "active": {
+            
+            tempArray = tasksArray.filter((item) => !item.isChecked);
+            // showStatus.textContent = "Active("+notCheckAllCount+")";
+            break;
+        }
+        default: break;
+    }
     tasksList.innerHTML= "";
-    tasksArray.forEach((elem) => tasksList.innerHTML += `<div id="${elem.id}">
+    tempArray.forEach((elem) => tasksList.innerHTML += `<div id="${elem.id}">
     <input type="checkbox" ${elem.isChecked ? 'checked' : ''}><label>${elem.text}</label>
     <button>X</button>`);
     countCheck();
-    
+
 }
 
 function changes(event){//изменения инпута
@@ -52,6 +80,7 @@ function changes(event){//изменения инпута
 
    
 }
+
 function checkAll(){//делает все чекбоксы сделанными
     tasksArray.forEach((elem)=>elem.isChecked =true);
     render();
@@ -102,18 +131,38 @@ input.onblur = function(event) {// сохранение при блюре
 
 function countCheck(){// считает выбранные и не очень 
     checkAllCount = tasksArray.filter((item) => item.isChecked).length;
-    notCheckAllCount =tasksArray.length - checkAllCount;
-    let isFirst = true;
-    
-    tasksList.innerHTML += `</div><label>${"Active" + "(" + checkAllCount + ")" + "  "}</label>` ;
-    tasksList.innerHTML += `</div><label>${"  " + "Completed" + "(" + notCheckAllCount + ")" + "     "}</label>`;     
-    tasksList.innerHTML += `</div><label>${"  " + "All" + "(" + (checkAllCount+notCheckAllCount) + ")" }</label>`;  
-   
-    
-
+    notCheckAllCount = tasksArray.length - checkAllCount;
+    btnAll.textContent = `All(${tasksArray.length})`;
+    btnCompleted.textContent = `Completed(${tasksArray.length-notCheckAllCount})`;
+    btnActive.textContent = `Active(${tasksArray.length-checkAllCount})`;   
 }
 
-//showAllCompleted.addEventListener('click',countCheck);
+function chooseTaskStatus(event){
+    
+    switch(event.target.id) {
+        case 'all': 
+            filtrationStatus = 'all';
+            render();
+            break;
+        case 'completed':
+            filtrationStatus = 'completed';
+            render();
+            break;
+        case 'active':
+            filtrationStatus = 'active';
+            render();
+        default:
+            break;
+    }
+}
+
+
+
+
+
+
+//content.addEventListener('DOMContentLoaded', pagination);
+showStatus.addEventListener('click',chooseTaskStatus);
 input.addEventListener('keydown', saveInput);
 inp.addEventListener('keydown', handleEnter);
 selectAll.addEventListener('click', checkAll);
