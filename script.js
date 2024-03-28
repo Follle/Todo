@@ -9,13 +9,16 @@ const showStatus = document.querySelector('.tab-btn');
 const btnAll = document.getElementById('all');
 const btnCompleted = document.getElementById('completed');
 const btnActive = document.getElementById('active');
-//addconst content = document.querySelector('.content');
+const pag = document.querySelector('.pagination');
 
 
 let tasksArray = [];
 let checkAllCount=[];
 let notCheckAllCount=0;
 let filtrationStatus = 'all';
+let currentPage = 0;
+let totalPages = 0;
+let rows = 5;
 
 function addTask () {
     tasksArray.push({
@@ -26,35 +29,49 @@ function addTask () {
     render();
 }
 
-function render() {// выводит инфу
-    let tempArray = [];
-    switch(filtrationStatus){
-        case "all": {
-            
-            tempArray = tasksArray;
-            // showStatus.textContent = "All("+(checkAllCount+notCheckAllCount)+")";
-            break;
-        }
-        case "completed": {
-          
-            tempArray = tasksArray.filter((item) => item.isChecked);
-            // showStatus.textContent = "Completed("+checkAllCount+")";
-            break;
-        }    
-        case "active": {
-            
-            tempArray = tasksArray.filter((item) => !item.isChecked);
-            // showStatus.textContent = "Active("+notCheckAllCount+")";
-            break;
-        }
-        default: break;
+
+function filterArray() {
+    switch (filtrationStatus) {
+    case 'completed': {
+    return tasksArray.filter((item) => item.isChecked);
     }
+    case 'active': {
+    return tasksArray.filter((item) => !item.isChecked);
+    }
+    case 'all': {
+    return tasksArray;
+    }
+    default: return tasksArray;
+    }
+    }
+    
+    function getSlicedArray() {
+    const tempArray = filterArray();
+    const start = currentPage * rows;
+    const end = start + rows;
+    const slicedArr = tempArray.slice(start, end);
+    return ({ slicedArr, countOfTasks: tempArray.length });
+    }
+    
+    function createPageButtons(tempArray) {
+    pag.innerHTML = '';
+    totalPage = Math.ceil(tempArray / rows);
+    if (tempArray < 1) {
+    return;
+    }
+    for (let i = 0; i <= totalPage - 1; i += 1) {
+    pag.innerHTML += `<button class="page" id="${i}">${i + 1}</button>`;
+    }
+    }
+
+function render() {// выводит инфу
+    const info = getSlicedArray();
     tasksList.innerHTML= "";
-    tempArray.forEach((elem) => tasksList.innerHTML += `<div id="${elem.id}">
+    info.slicedArr.forEach((elem) => tasksList.innerHTML += `<div id="${elem.id}">
     <input type="checkbox" ${elem.isChecked ? 'checked' : ''}><label>${elem.text}</label>
     <button>X</button>`);
+    createPageButtons(info.countOfTasks);
     countCheck();
-
 }
 
 function changes(event){//изменения инпута
@@ -77,8 +94,6 @@ function changes(event){//изменения инпута
         render();
         
     }
-
-   
 }
 
 function checkAll(){//делает все чекбоксы сделанными
@@ -137,8 +152,13 @@ function countCheck(){// считает выбранные и не очень
     btnActive.textContent = `Active(${tasksArray.length-checkAllCount})`;   
 }
 
+function checkCurrentPage(event) {
+    currentPage = Number(event.target.id);
+    render();
+}
+
 function chooseTaskStatus(event){
-    
+    currentPage = 0;
     switch(event.target.id) {
         case 'all': 
             filtrationStatus = 'all';
@@ -157,11 +177,7 @@ function chooseTaskStatus(event){
 }
 
 
-
-
-
-
-//content.addEventListener('DOMContentLoaded', pagination);
+pag.addEventListener('click', checkCurrentPage);
 showStatus.addEventListener('click',chooseTaskStatus);
 input.addEventListener('keydown', saveInput);
 inp.addEventListener('keydown', handleEnter);
