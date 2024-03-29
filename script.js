@@ -1,197 +1,188 @@
-const btn = document.querySelector('.add-btn');
-const inp = document.querySelector('.i-1');
+const buttonAddTask = document.querySelector('.add-button');
+const handlerEnterAddTask = document.querySelector('.enter-add-task');
 const tasksList= document.querySelector('.tasks-list');
-const selectAll = document.querySelector('.i-2');
-const cancel = document.querySelector('.i-3');
-const showAllCompleted = document.querySelector('.i-4');
-const input = document.createElement('input');
-const showStatus = document.querySelector('.tab-btn');
-const btnAll = document.getElementById('all');
-const btnCompleted = document.getElementById('completed');
-const btnActive = document.getElementById('active');
-const pag = document.querySelector('.pagination');
-
+const selectAllTasks = document.querySelector('.select-all-tasks');
+const deleteAllTasks = document.querySelector('.delete-all-tasks');
+const inputSaveTasks = document.createElement('input');
+const showStatusTasks = document.querySelector('.button-status');
+const buttonAllTasks = document.getElementById('all');
+const buttonCompletedTasks = document.getElementById('completed');
+const buttonActiveTasks = document.getElementById('active');
+const pagination = document.querySelector('.pagination');
 
 let tasksArray = [];
 let checkAllCount= 0;
 let notCheckAllCount= 0;
 let filtrationStatus = 'all';
 let currentPage = 0;
-// let currentPage = 0;
-let rows = 5;
+let countElements = 5;
+let page = 1;
+let lastPage = 1;
 
 function addTask () {
-    tasksArray.push({
-        id: Date.now(),
-        text: inp.value,
-        isChecked: false,
-    }); 
-    
-    // currentPage = Math.ceil(tasksArray.length / rows);
-    console.log(currentPage);
-
-    //if (elem.text==""){console.log()}
-    render();
+    if (handlerEnterAddTask.value.trim() !== '') {
+        tasksArray.push({
+            id: Date.now(),
+            text: handlerEnterAddTask.value.replace(/\s+/g, ' ').trim(),
+            isChecked: false,
+        });
+        page = Math.ceil(filterArray().length / countElements);
+        handlerEnterAddTask.value = '';
+        render();
+        thisPage(page);
+    }
 }
-
 
 function filterArray() {
     switch (filtrationStatus) {
-    case 'completed': {
-    return tasksArray.filter((item) => item.isChecked);
+        case 'completed': {
+            return tasksArray.filter((item) => item.isChecked);
     }
-    case 'active': {
-    return tasksArray.filter((item) => !item.isChecked);
+        case 'active': {
+            return tasksArray.filter((item) => !item.isChecked);
     }
-    case 'all': {
-    return tasksArray;
+        case 'all': {
+            return tasksArray;
     }
-    default: return tasksArray;
+        default: return tasksArray;
     }
-    }
-    
-    function getSlicedArray() {
-    
+}
+function getSlicedArray() {
     const tempArray = filterArray();
-    const start = currentPage * rows;
-    // const start = (currentPage - 1) * rows;
-    const end = start + rows;
-    const slicedArr = tempArray.slice(start, end);
-    
-    return ({ slicedArr, countOfTasks: tempArray.length });
-    
+    const startPosition = currentPage * countElements;
+    const endPosition = startPosition + countElements;
+    const slicedArray = tempArray.slice(startPosition, endPosition);
+    return ({ slicedArray, countOfTasks: tempArray.length });
+}
 
+function createPageButtons() {
+    let pages = '';
+    const count = filterArray().length;
+    totalPage = Math.ceil(count / countElements);
+    lastPage = totalPage;
+    for (let i = 0; i < totalPage; i += 1) {
+        pages += `<button class="page" id="${i+1}">${i + 1}</button>`;
     }
-    
-    function createPageButtons(tempArray) {
-    pag.innerHTML = '';
-    totalPage = Math.ceil(tempArray / rows);
-    if (tempArray < 1) {
-    return;
-    }
-    for (let i = 0; i <= totalPage - 1; i += 1) {
-    pag.innerHTML += `<button class="page" id="${i}">${i + 1}</button>`;
-    }
-    }
+    pagination.innerHTML = pages;
+}
 
-    function render() {// выводит инфу
-    
-        const info = getSlicedArray();
-        // if (elem.text==""){console.log()}
-        tasksList.innerHTML= "";
-        info.slicedArr.forEach((elem) => tasksList.innerHTML += `<div id="${elem.id}">
-        <input type="checkbox" ${elem.isChecked ? 'checked' : ''}><label>${elem.text} </label> 
-        <button>X</button> `);
-        createPageButtons(info.countOfTasks);
-        countCheck();
+function thisPage(newPage){
+    if(newPage !== lastPage){
+        page = newPage;
+    }else {
+        page = Math.ceil(filterArray().length / countElements)
     }
+}
 
-    // function render() {
-    //     const info = getSlicedArray();
-    //     info.slicedArr.forEach((elem) => {
-    //         if (elem.text === "") {
-    //             console.log("GBPLF");
-    //         } 
-    //         else {
-    //             tasksList.innerHTML += `<div id="${elem.id}">
-    //             <input type="checkbox" ${elem.isChecked ? 'checked' : ''}>
-    //             <label>${elem.text} (required)</label>
-    //             <button>X</button>
-    //             </div>`;
-    //         }
-    //     });
-    //     createPageButtons(info.countOfTasks);
-    //     countCheck();
-    // }
+function render() {// the main function that displays all the functionality
+    thisPage(page);
+    const configuredTodos = filterArray()
+    .slice((page -1) * countElements, page * countElements)
+    tasksList.innerHTML= "";
+    configuredTodos.forEach((elem) => {
+        tasksList.innerHTML += `<div id="${elem.id}">
+        <input type="checkbox" ${elem.isChecked ? 'checked' : ''}>
+        <label>${elem.text}</label>
+        <button>X</button> `
+    });
+    createPageButtons();
+    countCheckTasks();
+    inputSaveTasks.onblur = saveTaskOnBlur;
+}
 
-function changes(event){//изменения инпута
+function deleteTask(event){ // delete selected checkbox
     const taskId = Number(event.target.parentElement.id);
     if (event.target.tagName === 'BUTTON'){
         const elem = tasksArray.findIndex((elem) => elem.id === taskId)
         tasksArray.splice(elem, 1);
-        countCheck();
+        countCheckTasks();
         render();
-
     }
-
-    if (event.target.tagName === 'INPUT' && event.target.type === 'checkbox'){//удаляет завершенные
+    if (event.target.tagName === 'INPUT' && event.target.type === 'checkbox'){
         const elem = tasksArray.findIndex((elem) => elem.id === taskId)
         tasksArray[elem].isChecked = !tasksArray[elem].isChecked;
-        if (event.target.tagName === 'Enter') {
+    if (event.target.tagName === 'Enter') {
         addTask();
     }
-        countCheck();
-        render();
-        
+    countCheckTasks();
+    render();
     }
 }
 
-function checkAll(){//делает все чекбоксы сделанными
+function checkAllTasks(){// make all checkboxes done
     tasksArray.forEach((elem)=>elem.isChecked =true);
     render();
-
 }
 
-function checkAndDelete(){// удаляет по одному
-   tasksArray = tasksArray.filter((item) => !item.isChecked)
-   render();
+function checkAndDeleteAllTasks(){// delete all Tasks
+    tasksArray = tasksArray.filter((item) => !item.isChecked)
+    render();
 }
 
-function handleEnter (event) { // сохраняет при нажатии enter
+function handleEnterSave (event) { // save  when pressing a button enter  
     if (event.code === 'Enter') {
-        addTask();
+    addTask();
     }
 }
 
-function editTask(event){//редактирование существующего
+function addChangeTask(event){ //editing existing
     const taskId = Number(event.target.parentElement.id);
     const temp = event.target;
     if (event.target.tagName === 'LABEL')
-    {
-        input.value = tasksArray[tasksArray.findIndex((item) => item.id === taskId)].text;
-        input.id = taskId;
-        temp.replaceWith(input);
-        input.focus();
+       {
+        inputSaveTasks.value = tasksArray[tasksArray.findIndex((item) => item.id === taskId)].text;
+        inputSaveTasks.id = taskId;
+        temp.replaceWith(inputSaveTasks);
+        inputSaveTasks.focus();
     }
-    
 }
 
-function saveInput(event){
-    if (event.code === 'Enter') { //сохраняет при нажатии enter 
-        tasksArray[tasksArray.findIndex((item) => Number(item.id) === Number(input.id))].text = input.value;
+function saveInputTask(event){
+    if (inputSaveTasks.value.trim() !== '') {
+        if
+        (event.code === 'Enter') { // save changes when pressing a button enter  
+        tasksArray[tasksArray.findIndex((item) =>
+        Number(item.id) === Number(inputSaveTasks.id))]
+        .text = inputSaveTasks.value;
         render();
     }
+        }
     
-    if (event.code === 'Escape'){//отменяет изменения при нажатии escape
+
+    if (event.code === 'Escape'){//cancels changes when pressing a button escape
         render();
     }
 }
 
-input.onblur = function(event) {// сохранение при блюре
-    if (event.sourceCapabilities !== null) {
-        tasksArray[tasksArray.findIndex((item) => Number(item.id) === Number(input.id))].text = input.value;
-    render();
-    }
+function saveTaskOnBlur(event) {
+    if (inputSaveTasks.value.trim() !== '') {
+        if (event.sourceCapabilities !== null) {
+            tasksArray[tasksArray.findIndex((item) => Number(item.id) === Number(inputSaveTasks.id))].text = inputSaveTasks.value;
+            render();
+        }
 }
 
-function countCheck(){// считает выбранные и не очень 
+function countCheckTasks(){// counts selected 
     checkAllCount = tasksArray.filter((item) => item.isChecked).length;
     notCheckAllCount = tasksArray.length - checkAllCount;
-    btnAll.textContent = `All(${tasksArray.length})`;
-    btnCompleted.textContent = `Completed(${tasksArray.length-notCheckAllCount})`;
-    btnActive.textContent = `Active(${tasksArray.length-checkAllCount})`;   
+    buttonAllTasks.textContent = `All(${tasksArray.length})`;
+    buttonCompletedTasks.textContent = `Completed(${tasksArray.length-notCheckAllCount})`;
+    buttonActiveTasks.textContent = `Active(${tasksArray.length-checkAllCount})`;
 }
 
 function checkCurrentPage(event) {
-    currentPage = Number(event.target.id);
+    if(event.target.classList.contains('page')){
+        page = Number(event.target.id);
+        thisPage(page);
+    }
     render();
 }
 
 function chooseTaskStatus(event){
     currentPage = 0;
     switch(event.target.id) {
-        
-        case 'all': 
+
+        case 'all':
             filtrationStatus = 'all';
             render();
             break;
@@ -207,13 +198,12 @@ function chooseTaskStatus(event){
     }
 }
 
-
-pag.addEventListener('click', checkCurrentPage);
-showStatus.addEventListener('click',chooseTaskStatus);
-input.addEventListener('keydown', saveInput);
-inp.addEventListener('keydown', handleEnter);
-selectAll.addEventListener('click', checkAll);
-cancel.addEventListener('click', checkAndDelete);
-tasksList.addEventListener('dblclick', editTask);
-tasksList.addEventListener('click', changes);
-btn.addEventListener('click', addTask);
+pagination.addEventListener('click', checkCurrentPage);
+showStatusTasks.addEventListener('click',chooseTaskStatus);
+inputSaveTasks.addEventListener('keydown', saveInputTask);
+handlerEnterAddTask.addEventListener('keydown', handleEnterSave);
+selectAllTasks.addEventListener('click', checkAllTasks);
+deleteAllTasks.addEventListener('click', checkAndDeleteAllTasks);
+tasksList.addEventListener('dblclick', addChangeTask);
+tasksList.addEventListener('click', deleteTask);
+buttonAddTask.addEventListener('click', addTask);
