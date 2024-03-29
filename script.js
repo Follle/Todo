@@ -1,5 +1,5 @@
 const buttonAddTask = document.querySelector('.add-button');
-const handlerEnterAddTask = document.querySelector('.enter-add-task');
+const handlerEnterAddTask = document.querySelector('.enter-add-task-input');
 const tasksList= document.querySelector('.tasks-list');
 const selectAllTasks = document.querySelector('.select-all-tasks');
 const deleteAllTasks = document.querySelector('.delete-all-tasks');
@@ -133,21 +133,25 @@ function addChangeTask(event){ //editing existing
         inputSaveTasks.value = tasksArray[tasksArray.findIndex((item) => item.id === taskId)].text;
         inputSaveTasks.id = taskId;
         temp.replaceWith(inputSaveTasks);
-        inputSaveTasks.focus();
+        
     }
 }
 
 function saveInputTask(event){
+    const taskId = Number(event.target.parentElement.id);
+    const temp = event.target;
     if (inputSaveTasks.value.trim() !== '') {
         if
         (event.code === 'Enter') { // save changes when pressing a button enter  
-        tasksArray[tasksArray.findIndex((item) =>
-        Number(item.id) === Number(inputSaveTasks.id))]
-        .text = inputSaveTasks.value;
         render();
-    }
         }
-    
+    }
+    else{
+        inputSaveTasks.value = tasksArray[tasksArray.findIndex((item) => item.id === taskId)].text;
+        inputSaveTasks.id = taskId;
+        temp.replaceWith(inputSaveTasks);
+        inputSaveTasks.focus();
+    }
 
     if (event.code === 'Escape'){//cancels changes when pressing a button escape
         render();
@@ -155,11 +159,19 @@ function saveInputTask(event){
 }
 
 function saveTaskOnBlur(event) {
+    const taskId = Number(event.target.parentElement.id);
+    const temp = event.target;
     if (inputSaveTasks.value.trim() !== '') {
         if (event.sourceCapabilities !== null) {
             tasksArray[tasksArray.findIndex((item) => Number(item.id) === Number(inputSaveTasks.id))].text = inputSaveTasks.value;
             render();
-        }
+        }   
+    }
+    else{
+        inputSaveTasks.value = tasksArray[tasksArray.findIndex((item) => item.id === taskId)].text;
+        inputSaveTasks.id = taskId;
+        temp.replaceWith(inputSaveTasks);
+        inputSaveTasks.focus();
     }
 }
 
