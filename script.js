@@ -160,6 +160,7 @@ function saveTaskOnBlur(event) {
             tasksArray[tasksArray.findIndex((item) => Number(item.id) === Number(inputSaveTasks.id))].text = inputSaveTasks.value;
             render();
         }
+    }
 }
 
 function countCheckTasks(){// counts selected 
