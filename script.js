@@ -82,7 +82,7 @@ function render() {// the main function that displays all the functionality
     configuredTodos.forEach((elem) => {
         tasksList.innerHTML += `<div id="${elem.id}">
         <input type="checkbox" ${elem.isChecked ? 'checked' : ''}>
-        <label>${elem.text}</label>
+        <label>${_.escape(elem.text)}</label>
         <button>X</button> `
     });
     createPageButtons();
@@ -133,6 +133,7 @@ function addChangeTask(event){ //editing existing
         inputSaveTasks.value = tasksArray[tasksArray.findIndex((item) => item.id === taskId)].text;
         inputSaveTasks.id = taskId;
         temp.replaceWith(inputSaveTasks);
+        inputSaveTasks.focus();
         
     }
 }
@@ -143,7 +144,8 @@ function saveInputTask(event){
     if (inputSaveTasks.value.trim() !== '') {
         if
         (event.code === 'Enter') { // save changes when pressing a button enter  
-        render();
+            tasksArray[tasksArray.findIndex((item) => Number(item.id) === Number(inputSaveTasks.id))].text = inputSaveTasks.value;
+            render();
         }
     }
     else{
