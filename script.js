@@ -18,6 +18,7 @@ let currentPage = 0;
 let countElements = 5;
 let page = 1;
 let lastPage = 1;
+let allChecked = false;
 
 function addTask () {
     if (handlerEnterAddTask.value.trim() !== '') {
@@ -25,6 +26,7 @@ function addTask () {
             id: Date.now(),
             text: handlerEnterAddTask.value.replace(/\s+/g, ' ').trim(),
             isChecked: false,
+
         });
         page = Math.ceil(filterArray().length / countElements);
         handlerEnterAddTask.value = '';
@@ -81,7 +83,7 @@ function render() {// the main function that displays all the functionality
     tasksList.innerHTML= "";
     configuredTodos.forEach((elem) => {
         tasksList.innerHTML += `<div class="task" id="  ${elem.id}  ">
-        <input type="checkbox" class="checkbox-left" style = "transform:scale(1.5)"${elem.isChecked ? 'checked' : ''}>
+        <input type="checkbox"  style = "transform:scale(1.5)"${elem.isChecked ? 'checked' : ''}>
         <label>${_.escape(elem.text)}</label>
         <button class="btn btn-danger"">X</button> `
     });
@@ -110,7 +112,7 @@ function deleteTask(event){ // delete selected checkbox
 }
 
 function checkAllTasks(){// make all checkboxes done
-    tasksArray.forEach((elem)=>elem.isChecked = !elem.isChecked);
+    tasksArray.forEach((elem)=>elem.isChecked = elem.isChecked);
     render();
 }
 
@@ -123,6 +125,7 @@ function handleEnterSave (event) { // save  when pressing a button enter
     if (event.code === 'Enter') {
     addTask();
     }
+    render();
 }
 
 function addChangeTask(event){ //editing existing
@@ -175,6 +178,7 @@ function saveTaskOnBlur(event) {
         temp.replaceWith(inputSaveTasks);
         inputSaveTasks.focus();
     }
+    render();
 }
 
 function countCheckTasks(){// counts selected 

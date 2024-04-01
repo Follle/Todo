@@ -35,18 +35,17 @@ body{
 
   .tasks-list{
     background:#b1cfcf;
-    
   }
+
   .btn-danger{
     border-radius: 8px;
   }
-
 
  .task {
   display: flex;
   justify-content: space-between;
   width: 500px;
-  
+  margin: 6px;
  }
 
  #all{
@@ -69,5 +68,7 @@ body{
   border-radius: 200px;
   border: 0;
  }
-
+ .btn btn-outline-success{
+  transform:scale(1.5);
+ }
  
