@@ -1,8 +1,8 @@
-const buttonAddTask = document.querySelector('.add-button');
+const buttonAddTask = document.querySelector('.btn-light');
 const handlerEnterAddTask = document.querySelector('.enter-add-task-input');
 const tasksList= document.querySelector('.tasks-list');
-const selectAllTasks = document.querySelector('.select-all-tasks');
-const deleteAllTasks = document.querySelector('.delete-all-tasks');
+const selectAllTasks = document.querySelector('.btn-outline-success');
+const deleteAllTasks = document.querySelector('.btn-outline-danger');
 const inputSaveTasks = document.createElement('input');
 const showStatusTasks = document.querySelector('.button-status');
 const buttonAllTasks = document.getElementById('all');
@@ -80,10 +80,10 @@ function render() {// the main function that displays all the functionality
     .slice((page -1) * countElements, page * countElements)
     tasksList.innerHTML= "";
     configuredTodos.forEach((elem) => {
-        tasksList.innerHTML += `<div id="${elem.id}">
-        <input type="checkbox" ${elem.isChecked ? 'checked' : ''}>
+        tasksList.innerHTML += `<div class="task" id="  ${elem.id}  ">
+        <input type="checkbox" class="checkbox-left" style = "transform:scale(1.5)"${elem.isChecked ? 'checked' : ''}>
         <label>${_.escape(elem.text)}</label>
-        <button>X</button> `
+        <button class="btn btn-danger"">X</button> `
     });
     createPageButtons();
     countCheckTasks();
@@ -110,7 +110,7 @@ function deleteTask(event){ // delete selected checkbox
 }
 
 function checkAllTasks(){// make all checkboxes done
-    tasksArray.forEach((elem)=>elem.isChecked =true);
+    tasksArray.forEach((elem)=>elem.isChecked = !elem.isChecked);
     render();
 }
 
